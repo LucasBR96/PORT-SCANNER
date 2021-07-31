@@ -18,7 +18,11 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     # Tentando conexão, o tempo é medido para calibrar o
     # valor de timeout na proxima tentativa
     t = time.time()
-    result = sock.connect_ex( tup )
+    # result = sock.connect_ex( tup )
+    result = "SUCCESS"
+    try: sock.connect( tup )
+    except sck.error as e:
+        result = e
     dt = time.time() - t
 
     #--------------------------------------------------
@@ -34,17 +38,27 @@ def string_connect_result( port_num , result, dt ):
     port_name = sck.getservbyport( port_num ).upper()
     true_time = "{:.5f} seconds".format( dt )
     
-    result_name = "SUCCESS" 
-    if result:
-        result_name = errorcode[ result ]
+   #  result_name = "SUCCESS" 
+   #  if result:
+   #      result_name = errorcode[ result ]
 
     s = "-"*50 + "\n"
     s += "{} {}\n".format( port_num , port_name )
-    s += "{} {}\n".format( result , result_name )
+   #  s += "{} {}\n".format( result , result_name )
+    s += str( result ).upper() + "\n" 
     s += true_time
 
     return s
 
+def scan_header( host_name, start , end , timeout = 1. , alpha = .15 ):
+
+    host_ip = sck.gethostbyname( host_name )
+    s = "\nHost with name \"{}\" have IP of \"{}\"\n".format( host_name , host_ip )
+    s += "START {} END {}\n".format( start , end )
+    s += "TIMEOUT OF {:.5F} seconds\n".format( timeout )
+    s += "ALPHA OF {:.5f}%\n".format( 100*alpha )
+
+    return s
 
 def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
     
@@ -52,10 +66,11 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
     escaneameto de modo iterativo, em contraste com o modo multithread
     '''
 
-    host_ip = sck.gethostbyname( host_name )
-    s = "\nHost with name \"{}\" have IP of \"{}\"\n".format( host_name , host_ip )
+    s = scan_header( host_name, start , end , timeout , alpha )
     yield s
     
+    host_ip = sck.gethostbyname( host_name )
+
     #--------------------------------------------------
     # caso aluem troque os valores
     if start > end: start , end = end , start
@@ -80,8 +95,8 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
 if __name__ == "__main__":
 
     s = "www.amazon.com.br"
-    start , end = 80 , 500
-    t = 8.
+    start , end = 80 , 1024
+    t = 2.
 
     resp = iteractive_scan( s , start, end, timeout = t, alpha = .1 )
     for s in resp:
