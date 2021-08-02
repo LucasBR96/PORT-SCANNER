@@ -18,11 +18,12 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     # Tentando conexão, o tempo é medido para calibrar o
     # valor de timeout na proxima tentativa
     t = time.time()
-    # result = sock.connect_ex( tup )
-    result = "SUCCESS"
+    result = "ABERTA"
     try: sock.connect( tup )
     except sck.error as e:
-        result = e
+        result = "FECHADA"
+        if e.__class__ == sck.timeout or e.args[0] == 10060:
+            result = "FILTRADA"
     dt = time.time() - t
 
     #--------------------------------------------------
@@ -41,17 +42,7 @@ def string_connect_result( port_num , result, dt ):
 
     s = "-"*50 + "\n"
     s += "{} {}\n".format( port_num , port_name )
-
-   # se não houve erro, a porta é aberta
-    if result == "SUCCESS":
-        s += "ABERTA"
-   # se ocorrer o timeout do socket ou do sistema, a porta é filtrada
-    elif result.__class__ == sck.timeout or result.args[0] == 10060:
-        s += "FILTRADA"
-   # nos outros erros, a porta é fechada
-    else:
-        s += "FECHADA"
-    s += "\n"
+    s += result + "\n"
     s += true_time
 
     return s
@@ -65,6 +56,15 @@ def scan_header( host_name, start , end , timeout = 1. , alpha = .15 ):
     s += "ALPHA OF {:.5f}%\n".format( 100*alpha )
 
     return s
+
+def summary_str( summary ):
+
+    s = "\n" + "-"*50 + "\n"
+    s += "\nSUMMARY OF PORT SCANNING\n"
+    for result , freq in summary.items():
+        s += "{} {}\n".format( result , freq )
+    return s
+
 
 def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
     
@@ -101,12 +101,12 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
         #--------------------------------------------------
         # salvando resultados na para summrizar
         summary[ result ] = summary.get( result , 0 ) + 1
-
+    yield summary_str( summary )
 
 if __name__ == "__main__":
 
     s = "g1.globo.com"
-    start , end = 80 , 1024
+    start , end = 80 , 2048
     t = 1.
     
     
