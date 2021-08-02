@@ -45,7 +45,21 @@ def string_connect_result( port_num , result, dt ):
     s = "-"*50 + "\n"
     s += "{} {}\n".format( port_num , port_name )
    #  s += "{} {}\n".format( result , result_name )
-    s += str( result ).upper() + "\n" 
+   #  s += str( result ).upper() + "\n"
+
+   # estas duas classes de erro representam erros no nome do host alvo (não sei se esta parte é necessária)
+    #if result.__class__ == sck.gaierror or result.__class__ == sck.herror:
+        #exit("Erro no nome do host alvo")
+
+   # se não houve erro, a porta é aberta
+    if result == "SUCCESS":
+        s += "ABERTA"
+   # se ocorrer o timeout do socket ou do sistema, a porta é filtrada
+    elif result.__class__ == sck.timeout or result.args[0] == 10060:
+        s += "FILTRADA"
+   # nos outros erros, a porta é fechada
+    else:
+        s += "FECHADA"
     s += true_time
 
     return s
