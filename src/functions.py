@@ -1,7 +1,7 @@
 import time
 import socket as sck
 from errno import errorcode
-
+import sys
 
 def try_connect( port_num , host_ip , timeout = 1. ):
 
@@ -74,6 +74,7 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
     #--------------------------------------------------
     # caso aluem troque os valores
     if start > end: start , end = end , start
+    summary = {}
 
     for port_num in range( start , end + 1 ):
         
@@ -91,15 +92,24 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
         # recomputando timeout
         timeout = ( 1 - alpha )*timeout + alpha*dt
 
+        #--------------------------------------------------
+        # salvando resultados na para summrizar
+        summary[ result ] = summary.get( result , 0 ) + 1
+
 
 if __name__ == "__main__":
 
-    s = "www.amazon.com.br"
+    s = "g1.globo.com"
     start , end = 80 , 1024
-    t = 2.
-
+    t = 5.
+    
+    
     resp = iteractive_scan( s , start, end, timeout = t, alpha = .1 )
-    for s in resp:
-        print( s )
+    try:
+        for s in resp:
+            print( s )
+    except KeyboardInterrupt:
+        print( "\n ABORTANDO!" )
+        sys.exit()
 
 
