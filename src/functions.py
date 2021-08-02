@@ -38,18 +38,9 @@ def string_connect_result( port_num , result, dt ):
     port_name = sck.getservbyport( port_num ).upper()
     true_time = "{:.5f} seconds".format( dt )
     
-   #  result_name = "SUCCESS" 
-   #  if result:
-   #      result_name = errorcode[ result ]
 
     s = "-"*50 + "\n"
     s += "{} {}\n".format( port_num , port_name )
-   #  s += "{} {}\n".format( result , result_name )
-   #  s += str( result ).upper() + "\n"
-
-   # estas duas classes de erro representam erros no nome do host alvo (não sei se esta parte é necessária)
-    #if result.__class__ == sck.gaierror or result.__class__ == sck.herror:
-        #exit("Erro no nome do host alvo")
 
    # se não houve erro, a porta é aberta
     if result == "SUCCESS":
@@ -60,6 +51,7 @@ def string_connect_result( port_num , result, dt ):
    # nos outros erros, a porta é fechada
     else:
         s += "FECHADA"
+    s += "\n"
     s += true_time
 
     return s
@@ -115,7 +107,7 @@ if __name__ == "__main__":
 
     s = "g1.globo.com"
     start , end = 80 , 1024
-    t = 5.
+    t = 1.
     
     
     resp = iteractive_scan( s , start, end, timeout = t, alpha = .1 )
