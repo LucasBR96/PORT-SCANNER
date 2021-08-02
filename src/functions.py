@@ -2,6 +2,7 @@ import time
 import socket as sck
 from errno import errorcode
 import sys
+import re
 
 def try_connect( port_num , host_ip , timeout = 1. ):
 
@@ -102,6 +103,15 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
         # salvando resultados na para summrizar
         summary[ result ] = summary.get( result , 0 ) + 1
     yield summary_str( summary )
+
+def handle_input( input_str ):
+
+    '''
+    Os tipos de entradas aceitas:
+
+    HOSTNAME [START] [END] [TIMEOUT] [ALPHA]
+    '''
+
 
 if __name__ == "__main__":
 
