@@ -69,7 +69,7 @@ def summary_str( summary ):
     return s
 
 
-def iteractive_scan( host_name, start , end , timeout = 1.):
+def iteractive_scan( host_name, start , end , timeout):
     
     '''
     escaneameto de modo iterativo, em contraste com o modo multithread
@@ -115,10 +115,9 @@ def handle_input( input_lst ):
     if len( input_lst ) > 2:
         end = min( 65535 , int( input_lst[ 2 ] ) )
 
-    timeout = 1.
+    timeout = 22.
     if len( input_lst ) > 3:
-        timeout = max( 1. , float( input_lst[ 3 ] ) )
-        timeout = min( 60. , timeout )
+        timeout = max( 3. , float( input_lst[ 3 ] ) )
     
     return host_name , start , end , timeout
 
@@ -138,7 +137,7 @@ if __name__ == "__main__":
     #     print( "\n ABORTANDO!" )
     #     sys.exit()
 
-    s , start , end , t , a = handle_input( sys.argv[ 1: ] )
+    s , start , end , t = handle_input( sys.argv[ 1: ] )
     resp = iteractive_scan( s , start, end, timeout = t)
     try:
         for s in resp:
