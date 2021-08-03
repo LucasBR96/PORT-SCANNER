@@ -37,12 +37,15 @@ def try_connect( port_num , host_ip , timeout = 1. ):
 
 def string_connect_result( port_num , result, dt ):
     
-    port_name = sck.getservbyport( port_num ).upper()
+    try:
+        port_name = sck.getservbyport( port_num ).upper()
+    except OSError:
+        port_name = "NO SERVICE"
     true_time = "{:.5f} seconds".format( dt )
     
 
     s = "-"*50 + "\n"
-    s += "{} {}\n".format( port_num , port_name )
+    s += "PORT {}: {}\n".format( port_num , port_name )
     s += result + "\n"
     s += true_time
 
@@ -84,12 +87,6 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
     summary = {}
 
     for port_num in range( start , end + 1 ):
-        
-        #--------------------------------------------------
-        # algus valores para porta não tem um protocolo mapeado
-        # se for o caso pula-se o numero
-        try: sck.getservbyport( port_num )
-        except OSError: continue
 
         result , dt = try_connect( port_num, host_ip, timeout )
         s = string_connect_result( port_num, result, dt )
