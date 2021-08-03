@@ -23,15 +23,14 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     try: sock.connect( tup )
     except sck.error as e:
         result = "FECHADA"
-        if e.__class__ == sck.timeout or e.args[0] == 10060:
+        if e.__class__ == sck.timeout or e.__class__ == TimeoutError:
             result = "FILTRADA"
+    else:
+        # ja tem-se o errno então não precisamos mais do so
+        # cket.
+        sock.shutdown( sck.SHUT_RDWR )
     dt = time.time() - t
 
-    #--------------------------------------------------
-    # ja tem-se o errno então não precisamos mais do so
-    # cket.
-    if result != "FECHADA":
-        sock.shutdown( sck.SHUT_RDWR )
     sock.close()
 
     return result , dt
