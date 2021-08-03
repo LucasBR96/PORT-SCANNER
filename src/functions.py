@@ -51,7 +51,7 @@ def string_connect_result( port_num , result, dt ):
 def scan_header( host_name, start , end , timeout = 1. , alpha = .15 ):
 
     host_ip = sck.gethostbyname( host_name )
-    s = "\nHost with name \"{}\" have IP of \"{}\"\n".format( host_name , host_ip )
+    s = "\nHost \"{}\" have IP of \"{}\"\n".format( host_name , host_ip )
     s += "START {} END {}\n".format( start , end )
     s += "TIMEOUT OF {:.5F} seconds\n".format( timeout )
     s += "ALPHA OF {:.5f}%\n".format( 100*alpha )
