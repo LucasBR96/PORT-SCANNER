@@ -23,39 +23,40 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     try: sock.connect( tup )
     except sck.error as e:
         result = "FECHADA"
-        if e.__class__ == sck.timeout or e.args[0] == 10060:
+        if e.__class__ == sck.timeout or e.__class__ == TimeoutError:
             result = "FILTRADA"
+    else:
+        # ja tem-se o errno então não precisamos mais do so
+        # cket.
+        sock.shutdown( sck.SHUT_RDWR )
     dt = time.time() - t
 
-    #--------------------------------------------------
-    # ja tem-se o errno então não precisamos mais do so
-    # cket.
-    if result != "FECHADA":
-        sock.shutdown( sck.SHUT_RDWR )
     sock.close()
 
     return result , dt
 
 def string_connect_result( port_num , result, dt ):
     
-    port_name = sck.getservbyport( port_num ).upper()
+    try:
+        port_name = sck.getservbyport( port_num ).upper()
+    except OSError:
+        port_name = "NO SERVICE"
     true_time = "{:.5f} seconds".format( dt )
     
 
     s = "-"*50 + "\n"
-    s += "{} {}\n".format( port_num , port_name )
+    s += "PORT {}: {}\n".format( port_num , port_name )
     s += result + "\n"
     s += true_time
 
     return s
 
-def scan_header( host_name, start , end , timeout = 1. , alpha = .15 ):
+def scan_header( host_name, start , end , timeout = 1.):
 
     host_ip = sck.gethostbyname( host_name )
-    s = "\nHost with name \"{}\" have IP of \"{}\"\n".format( host_name , host_ip )
+    s = "\nHost \"{}\" have IP of \"{}\"\n".format( host_name , host_ip )
     s += "START {} END {}\n".format( start , end )
     s += "TIMEOUT OF {:.5F} seconds\n".format( timeout )
-    s += "ALPHA OF {:.5f}%\n".format( 100*alpha )
 
     return s
 
@@ -68,13 +69,13 @@ def summary_str( summary ):
     return s
 
 
-def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
+def iteractive_scan( host_name, start , end , timeout):
     
     '''
     escaneameto de modo iterativo, em contraste com o modo multithread
     '''
 
-    s = scan_header( host_name, start , end , timeout , alpha )
+    s = scan_header( host_name, start , end , timeout)
     yield s
     
     host_ip = sck.gethostbyname( host_name )
@@ -85,20 +86,10 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
     summary = {}
 
     for port_num in range( start , end + 1 ):
-        
-        #--------------------------------------------------
-        # algus valores para porta não tem um protocolo mapeado
-        # se for o caso pula-se o numero
-        try: sck.getservbyport( port_num )
-        except OSError: continue
 
         result , dt = try_connect( port_num, host_ip, timeout )
         s = string_connect_result( port_num, result, dt )
         yield s
-
-        #--------------------------------------------------
-        # recomputando timeout
-        timeout = ( 1 - alpha )*timeout + alpha*dt
 
         #--------------------------------------------------
         # salvando resultados na para summrizar
@@ -124,18 +115,11 @@ def handle_input( input_lst ):
     if len( input_lst ) > 2:
         end = min( 65535 , int( input_lst[ 2 ] ) )
 
-    timeout = 1.
+    timeout = 22.
     if len( input_lst ) > 3:
-        timeout = max( 1. , float( input_lst[ 3 ] ) )
-        timeout = min( 60. , timeout )
-
-    alpha = .1
-    if len( input_lst ) > 4:
-        alpha = max( 1 , int( input_lst[ 4 ] ) )
-        alpha = min( 100 , alpha )
-        alpha /= 100
+        timeout = max( 3. , float( input_lst[ 3 ] ) )
     
-    return host_name , start , end , timeout, alpha
+    return host_name , start , end , timeout
 
 if __name__ == "__main__":
     
@@ -153,8 +137,8 @@ if __name__ == "__main__":
     #     print( "\n ABORTANDO!" )
     #     sys.exit()
 
-    s , start , end , t , a = handle_input( sys.argv[ 1: ] )
-    resp = iteractive_scan( s , start, end, timeout = t, alpha = a )
+    s , start , end , t = handle_input( sys.argv[ 1: ] )
+    resp = iteractive_scan( s , start, end, timeout = t)
     try:
         for s in resp:
             print( s )
