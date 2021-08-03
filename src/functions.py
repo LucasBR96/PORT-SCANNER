@@ -30,7 +30,8 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     #--------------------------------------------------
     # ja tem-se o errno então não precisamos mais do so
     # cket.
-    sock.shutdown( sck.SHUT_RDWR )
+    if result != "FECHADA":
+        sock.shutdown( sck.SHUT_RDWR )
     sock.close()
 
     return result , dt
@@ -104,7 +105,7 @@ def iteractive_scan( host_name, start , end , timeout = 1. , alpha = .15 ):
         summary[ result ] = summary.get( result , 0 ) + 1
     yield summary_str( summary )
 
-def handle_input( input_str ):
+def handle_input( input_lst ):
 
     '''
     Os tipos de entradas aceitas:
@@ -112,20 +113,52 @@ def handle_input( input_str ):
     HOSTNAME [START] [END] [TIMEOUT] [ALPHA]
     '''
 
+    host_regex = re.compile( r'\b[\w\.]+\b' )
+    host_name = host_regex.match( input_lst[ 0 ] )[ 0 ]
+
+    start = 1
+    if len( input_lst ) > 1:
+        start = max( 1 , int( input_lst[ 1 ] ) )
+
+    end = 65535
+    if len( input_lst ) > 2:
+        end = min( 65535 , int( input_lst[ 2 ] ) )
+
+    timeout = 1.
+    if len( input_lst ) > 3:
+        timeout = max( 1. , float( input_lst[ 3 ] ) )
+        timeout = min( 60. , timeout )
+
+    alpha = .1
+    if len( input_lst ) > 4:
+        alpha = max( 1 , int( input_lst[ 4 ] ) )
+        alpha = min( 100 , alpha )
+        alpha /= 100
+    
+    return host_name , start , end , timeout, alpha
 
 if __name__ == "__main__":
+    
+    #--------------------------------------------------
+    # s = "g1.globo.com"
+    # start , end = 80 , 2048
+    # t = 1.
+    # 
+    # 
+    # resp = iteractive_scan( s , start, end, timeout = t, alpha = .1 )
+    # try:
+    #     for s in resp:
+    #         print( s )
+    # except KeyboardInterrupt:
+    #     print( "\n ABORTANDO!" )
+    #     sys.exit()
 
-    s = "g1.globo.com"
-    start , end = 80 , 2048
-    t = 1.
-    
-    
-    resp = iteractive_scan( s , start, end, timeout = t, alpha = .1 )
+    s , start , end , t , a = handle_input( sys.argv[ 1: ] )
+    resp = iteractive_scan( s , start, end, timeout = t, alpha = a )
     try:
         for s in resp:
             print( s )
     except KeyboardInterrupt:
         print( "\n ABORTANDO!" )
         sys.exit()
-
 
