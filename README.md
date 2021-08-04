@@ -34,4 +34,6 @@ O professor desafiou os alunos a otimizar o programa com a promessa de um ponto 
 
 ## Como usar
 
+Pode-se dizer que o programa ainda está em sua versão "beta" pois a versão com threads não está pronta nem testada, enquanto o Makefile não está pronto e não foi escrito ( ainda ) nenhum outro script de instalação. Então para executar o programa deve-se usar a forma "rudimentar".
 
+1. Use **git clone** para 
