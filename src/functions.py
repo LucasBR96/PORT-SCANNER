@@ -35,12 +35,20 @@ def try_connect( port_num , host_ip , timeout = 1. ):
 
     return result , dt
 
+def check_service( num ):
+
+    #--------------------------------------------------
+    # verifica se existe um protocolo conhecido para o
+    # numero de porta
+    try: sck.getservbyport( port_num ).upper()
+    except OSError: return False
+    return True
+
 def string_connect_result( port_num , result, dt ):
     
-    try:
-        port_name = sck.getservbyport( port_num ).upper()
-    except OSError:
-        port_name = "NO SERVICE"
+    port_name = "NO SERVICE"
+    if check_service( port_num ):
+        portname = sck.getservbyport( port_num ).number()
     true_time = "{:.5f} seconds".format( dt )
     
 
@@ -69,10 +77,17 @@ def summary_str( summary ):
     return s
 
 
-def iteractive_scan( host_name, start , end , timeout):
+def iteractive_scan( host_name, start , end , timeout, must_serv = True ):
     
     '''
     escaneameto de modo iterativo, em contraste com o modo multithread
+    para ambos, os argumentos:
+
+    host_name -> url
+    start     -> primeiro numero de porta a ser explorado
+    end       -> ultimo numero de porta a ser explorado
+    timeout   -> tempo maximo para a conexão
+    must_serv -> se o numero de porta não existir, pular o teste
     '''
 
     s = scan_header( host_name, start , end , timeout)
@@ -86,6 +101,8 @@ def iteractive_scan( host_name, start , end , timeout):
     summary = {}
 
     for port_num in range( start , end + 1 ):
+        
+        if must_serv and not( check_service( port_num ) ): continue
 
         result , dt = try_connect( port_num, host_ip, timeout )
         s = string_connect_result( port_num, result, dt )
