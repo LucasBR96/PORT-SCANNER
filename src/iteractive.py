@@ -40,7 +40,7 @@ def check_service( num ):
     #--------------------------------------------------
     # verifica se existe um protocolo conhecido para o
     # numero de porta
-    try: sck.getservbyport( port_num ).upper()
+    try: sck.getservbyport( num ).upper()
     except OSError: return False
     return True
 
@@ -48,7 +48,7 @@ def string_connect_result( port_num , result, dt ):
     
     port_name = "NO SERVICE"
     if check_service( port_num ):
-        portname = sck.getservbyport( port_num ).number()
+        port_name = sck.getservbyport( port_num ).upper()
     true_time = "{:.5f} seconds".format( dt )
     
 
