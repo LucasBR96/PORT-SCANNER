@@ -13,7 +13,6 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     sock = sck.socket( sck.AF_INET , sck.SOCK_STREAM )
     sock.settimeout( timeout )
     tup = ( host_ip , port_num )
-    #--------------------------------------------------
 
     #--------------------------------------------------
     # Tentando conexão, o tempo é medido para calibrar o
@@ -24,11 +23,7 @@ def try_connect( port_num , host_ip , timeout = 1. ):
     except sck.error as e:
         result = "FECHADA"
         if e.__class__ == sck.timeout or e.__class__ == TimeoutError:
-            result = "FILTRADA"
-    else:
-        # ja tem-se o errno então não precisamos mais do so
-        # cket.
-        sock.shutdown( sck.SHUT_RDWR )
+            result = "FILTRADA" 
     dt = time.time() - t
 
     sock.close()
@@ -118,7 +113,7 @@ def handle_input( input_lst ):
     '''
     Os tipos de entradas aceitas:
 
-    HOSTNAME [START] [END] [TIMEOUT] [ALPHA]
+    HOSTNAME [START] [END] [TIMEOUT] 
     '''
 
     host_regex = re.compile( r'\b[\w\.]+\b' )
@@ -140,19 +135,6 @@ def handle_input( input_lst ):
 
 if __name__ == "__main__":
     
-    #--------------------------------------------------
-    # s = "g1.globo.com"
-    # start , end = 80 , 2048
-    # t = 1.
-    # 
-    # 
-    # resp = iteractive_scan( s , start, end, timeout = t, alpha = .1 )
-    # try:
-    #     for s in resp:
-    #         print( s )
-    # except KeyboardInterrupt:
-    #     print( "\n ABORTANDO!" )
-    #     sys.exit()
 
     s , start , end , t = handle_input( sys.argv[ 1: ] )
     resp = iteractive_scan( s , start, end, timeout = t)
