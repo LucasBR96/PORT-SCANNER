@@ -2,7 +2,10 @@
 
 UFF - UNIVERSIDADE FEDERAL FLUMINENSE
 
-**Alunos**
+**Alunos:**
+1. Lucas Fuzato Cipriano
+2. João Pedro Loyola
+3. Joel Lopes Cunha de Souza
 
 **Matéria:** Redes de Computadores 1
 
@@ -12,19 +15,29 @@ UFF - UNIVERSIDADE FEDERAL FLUMINENSE
 
 ## O trabalho
 
-O objetivo desse trabalho é construir um port scanner, que é um programa que testa a conexão entre o computador do usuário e algum servidor dado pelo seu URL, através de um ou mais numero( s ) de porta, usando uma linguagem de programação de escolha dos integrantes do grupo e os conhecimentos adquiridos nas aulas da disciplina. Para tal, foi escolhida a linguagem de programação python na sua versão 3.8, sem nenhuma biblioteca de terceiros e usando apenas os módulos da biblioteca padrão. ( Entre eles o módulo socket ). Um detalhe é que esse projeto não utiliza objetos, a não ser aqueles de classes ja definidas pela linguagem.
+O objetivo desse trabalho é construir um port scanner, que é um programa que testa a conexão entre o computador do usuário e algum servidor dado pelo seu URL, através de um ou mais numero( s ) de porta, usando uma linguagem de programação de escolha dos integrantes do grupo e os conhecimentos adquiridos nas aulas da disciplina. Para tal, foi escolhida a linguagem de programação python na sua versão 3.8, sem nenhuma biblioteca de terceiros e usando apenas os módulos da biblioteca padrão. ( Entre eles o módulo socket ). 
 
-## Conteúdos desse diretório
+## Como foi Feito.
 
-O diretório aqui presente contém o código desenvolvido pelos integrantes do grupo para o trabalho. A pasta src contém o código fonte propriamente dito para a aplicação, o Makefile auxilia na instalação do aplicativo tema do projeto, e o README. Vendo a pasta src com mais detalhes:
+Existem dois modos de execução: O **Iterativo** ou Sequencial, que cumpre os requisitos pedidos no enunciado do trabalho, e o **Multithread** ou Paralelo, a versão otimizada feita para buscar o ponto extra oferecido pelo professor como desafio.
 
-1. O arquivo iteractive.py contém o código fonte para a execução do port scanner em modo iterativo, que é o modo de execução padrão para esse trabalho. No momento que este README é escrito esse arquivo está praticamente pronto.
+Em ambos os modos o port scanner cria um socket para cada numero de porta que esteja entre os valores mínimo e máximo e que tenha um número de protocolo conhecido, para depois tentar uma conexão com o host alvo. Se a conexão for aceita, o programa classifica a porta como **ABERTA**, se a conexão expirar por timeout, o programa considera que um firewall está impedindo o cliente de fazer uma conexão pela porta escolhida, então classifica porta como **FILTRADA**. Em qualquer outro caso, a porta será classificada como **FECHADA**.
 
-2. O arquivo thrdport.py, por sua vez, é a fonte para a excução em modo multithread. Esse modo foi pensado para o ponto extra que o professor ofereceu em troca do desafio de otimizar o aplicativo. Não está pronto ainda
+Para cada porta analisada, o scanner vai mostrar uma mensagem na tela igual à abaixo:
 
-3. O arquivo pscan.py é o código principal do aplicativo. Enquanto o Makefile não estiver pronto é por ele que o programa deve ser executado.
+``
 
-4. Finalmente, tests.py contém os testes para o garantir o bom funcionameto das funções desenvolvidas nos outros arquivos.
+Além disso, antes de estabelecer a conexão, o programa testará se um protocolo é conhecido para o número de porta. Se não for, o port scanner irá ignorar o número. Isso pode ser mudado ao ao trocar o valor da variável *must_serv* para *False* no código fonte.
+
+### Modo iterativo
+
+Aqui o programa vai testar uma porta por vez, e mostrar o resultado imediatamente na tela. É relativamente lento comparado ao outro modo, com o tempo total de execução igual a soma do tempo de todas as portas. Mas entrega o que foi pedido
+
+### Modo multithread
+
+Como foi dito antes, esse modo foi feito considerando o desafio proposto pelo professor. Nele, usando os recursos disponibilizados pelo módulo threading, cada conexão é testada por uma thread distinta. Assim todas as portas são testadas ao mesmo tempo ( na prática ). Aqui o programa espera todos os testes serem finalizados antes de mostrar os resultados. O tempo de execução é igual ao maior tempo de resposta entre os números de porta mais um pequeno overhead causado pelo escalonamento das threads.
+
+**CUIDADO:** Esse modo é bastante intensivo para a CPU. Podendo chegar a 100% de utilização. Use por sua conta e risco.
 
 ## Otimização
 
