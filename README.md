@@ -25,7 +25,26 @@ Em ambos os modos o port scanner cria um socket para cada numero de porta que es
 
 Para cada porta analisada, o scanner vai mostrar uma mensagem na tela igual à abaixo:
 
-``
+`
+Host "americanas.com" have IP of "3.85.179.206"
+START 80 END 90
+TIMEOUT OF 10.00000 seconds
+
+/--------------------------------------------------
+PORT 80: HTTP
+ABERTA
+/0.14860 seconds
+/--------------------------------------------------
+PORT 88: KERBEROS
+FILTRADA
+10.00521 seconds
+
+/--------------------------------------------------
+
+SUMMARY OF PORT SCANNING
+ABERTA 1
+FILTRADA 1
+`
 
 Além disso, antes de estabelecer a conexão, o programa testará se um protocolo é conhecido para o número de porta. Se não for, o port scanner irá ignorar o número. Isso pode ser mudado ao ao trocar o valor da variável *must_serv* para *False* no código fonte.
 
