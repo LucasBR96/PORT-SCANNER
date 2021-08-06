@@ -39,14 +39,31 @@ Como foi dito antes, esse modo foi feito considerando o desafio proposto pelo pr
 
 **CUIDADO:** Esse modo é bastante intensivo para a CPU. Podendo chegar a 100% de utilização. Use por sua conta e risco.
 
-## Otimização
-
-O professor desafiou os alunos a otimizar o programa com a promessa de um ponto extra em caso de sucesso. Seguindo a ideia do Joel, decidimos usar multithread para tal.
-
-`Joel explica a ideia de multithread dele aqui`
-
 ## Como usar
 
-Pode-se dizer que o programa ainda está em sua versão "beta" pois a versão com threads não está pronta nem testada, enquanto o Makefile não está pronto e não foi escrito ( ainda ) nenhum outro script de instalação. Então para executar o programa deve-se usar a forma "rudimentar".
+Antes de explicar, vale avisar que esse programa foi desenvolvido num computador LINUX com o kernel versão 5.4.0-80, usando a ditribuição MINT. Então não é garantido que esse programa rode bem em outras máquinas.
 
-1. Use **git clone** para 
+1. Salve o arquivo pscan.py no seu computador
+
+2. Abra o terminal ou prompt de comando e mude o diretório para a pasta onde você salvou o programa
+
+3. Digite: `python3 pscan.py`
+
+4. Por fim insira o input nesse formato
+
+`
+   host_name
+   start
+   end
+   mode
+`
+
+**host_name** -> url do host que será examinado. Por exemplo *www.amazon.com*
+
+**start**     -> inteiro, indica o número da primeira porta a ser analisada, valor mínimo igual a 1
+
+**end**       -> inteiro, indica o número da ultima porta a ser analisada, valor máximo igual a 65355
+
+**mode**      -> O valor deve **1** ou **0**, respectivamente modo paralelo ou sequencial.
+
+

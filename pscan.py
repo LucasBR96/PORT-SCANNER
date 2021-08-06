@@ -72,28 +72,6 @@ def summary_str( summary ):
         s += "{} {}\n".format( result , freq )
     return s
 
-def usr_inpt():
-    
-    host_name = "localhost"
-    s = "\nentre com o nome do host, default para \'localhost\' \n"
-    m = input( s )
-    if m != "":
-        host_name = m
-
-    s = "\nvalores da primeira e ultima porta, default para 1 e 65355 \n"
-    start , end = 1 , 65355
-    while( True ):
-        try:
-            m = input( s )
-            if m == "": break
-
-            a , b = map( int , m.split() )
-            if a > b: a , b = b , a
-            start , end = a , b
-            break
-
-        except ValueError:
-            continue
 
 # PARA O MODO ITERATIVO -----------------------------------------------------------------------------
 def iteractive_scan( host_name, start , end , timeout, must_serv = True ):
@@ -194,20 +172,25 @@ def thread_scan(  host_name, start , end , timeout, must_serv = True ):
 if __name__ == "__main__":
     
 
-    s = "amazon.com.br"
-    start = 1
-    end = 4096
+    host = input()
+    start = max( int( input() ), 1 )
+    end = min( int( input() ) , 65535 )
+    
+    # modo de execução, 0 para iterativo e demais numeros para paralelo
+    f = iteractive_scan
+    if ( int( input() ) ):
+        f = thread_scan
     t = 10.
-    for f in [ iteractive_scan , thread_scan ]
-        st = time.time()
-        resp = f( s , start, end, t)
-        try:
-            for s in resp:
-                print( s )
-        except KeyboardInterrupt:
-            print( "\n ABORTANDO!" )
-            sys.exit()
 
-        dt = time.time() - st
-        print( "A busca durou {:.5f} segundos".format( dt ) )
+    st = time.time()
+    resp = f( host , start, end, t)
+    try:
+        for s in resp:
+            print( s )
+    except KeyboardInterrupt:
+        print( "\n ABORTANDO!" )
+        sys.exit()
+
+    dt = time.time() - st
+    print( "A busca durou {:.5f} segundos".format( dt ) )
 
