@@ -73,8 +73,27 @@ def summary_str( summary ):
     return s
 
 def usr_inpt():
-    pass
+    
+    host_name = "localhost"
+    s = "\nentre com o nome do host, default para \'localhost\' \n"
+    m = input( s )
+    if m != "":
+        host_name = m
 
+    s = "\nvalores da primeira e ultima porta, default para 1 e 65355 \n"
+    start , end = 1 , 65355
+    while( True ):
+        try:
+            m = input( s )
+            if m == "": break
+
+            a , b = map( int , m.split() )
+            if a > b: a , b = b , a
+            start , end = a , b
+            break
+
+        except ValueError:
+            continue
 
 # PARA O MODO ITERATIVO -----------------------------------------------------------------------------
 def iteractive_scan( host_name, start , end , timeout, must_serv = True ):
@@ -122,10 +141,10 @@ class thread_port( thrd.Thread ):
     timeout = 1.
 
     def __init__( self, port_num ):    
-        super().__init__( self )
+        thrd.Thread.__init__( self )
         self.port_num = port_num
     
-    def run():
+    def run( self ):
 
         host_ip = thread_port.host_ip
         timeout = thread_port.timeout
@@ -153,12 +172,12 @@ def thread_scan(  host_name, start , end , timeout, must_serv = True ):
     # caso aluem troque os valores
     if start > end: start , end = end , start
     summary = {}
-
+    
     for port_num in range( start , end + 1 ):
         if must_serv and not( check_service( port_num ) ): continue
         thread_port( port_num ).start()
-    
     sync()
+        
     portas = thread_port.portas
     for port_num in range( start , end + 1 ):
         if port_num not in portas: continue
@@ -175,12 +194,20 @@ def thread_scan(  host_name, start , end , timeout, must_serv = True ):
 if __name__ == "__main__":
     
 
-    s , start , end , t = handle_input( sys.argv[ 1: ] )
-    resp = iteractive_scan( s , start, end, timeout = t)
-    try:
-        for s in resp:
-            print( s )
-    except KeyboardInterrupt:
-        print( "\n ABORTANDO!" )
-        sys.exit()
+    s = "amazon.com.br"
+    start = 1
+    end = 4096
+    t = 10.
+    for f in [ iteractive_scan , thread_scan ]
+        st = time.time()
+        resp = f( s , start, end, t)
+        try:
+            for s in resp:
+                print( s )
+        except KeyboardInterrupt:
+            print( "\n ABORTANDO!" )
+            sys.exit()
+
+        dt = time.time() - st
+        print( "A busca durou {:.5f} segundos".format( dt ) )
 
