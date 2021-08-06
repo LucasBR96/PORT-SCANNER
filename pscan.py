@@ -1,9 +1,10 @@
 import time
 import socket as sck
-from errno import errorcode
 import sys
 import re
+import threading as thrd
 
+# FUNÇOES COMUNS ------------------------------------------------------------------------------------
 def try_connect( port_num , host_ip , timeout = 1. ):
 
     #--------------------------------------------------
@@ -71,7 +72,11 @@ def summary_str( summary ):
         s += "{} {}\n".format( result , freq )
     return s
 
+def usr_inpt():
+    pass
 
+
+# PARA O MODO ITERATIVO -----------------------------------------------------------------------------
 def iteractive_scan( host_name, start , end , timeout, must_serv = True ):
     
     '''
@@ -108,30 +113,64 @@ def iteractive_scan( host_name, start , end , timeout, must_serv = True ):
         summary[ result ] = summary.get( result , 0 ) + 1
     yield summary_str( summary )
 
-def handle_input( input_lst ):
 
-    '''
-    Os tipos de entradas aceitas:
-
-    HOSTNAME [START] [END] [TIMEOUT] 
-    '''
-
-    host_regex = re.compile( r'\b[\w\.]+\b' )
-    host_name = host_regex.match( input_lst[ 0 ] )[ 0 ]
-
-    start = 1
-    if len( input_lst ) > 1:
-        start = max( 1 , int( input_lst[ 1 ] ) )
-
-    end = 65535
-    if len( input_lst ) > 2:
-        end = min( 65535 , int( input_lst[ 2 ] ) )
-
-    timeout = 22.
-    if len( input_lst ) > 3:
-        timeout = max( 3. , float( input_lst[ 3 ] ) )
+# PARA O MODO MULTITHREAD ---------------------------------------------------------------------------
+class thread_port( thrd.Thread ):
     
-    return host_name , start , end , timeout
+    portas = {}
+    host_ip = "127.0.0.1" #localhost
+    timeout = 1.
+
+    def __init__( self, port_num ):    
+        super().__init__( self )
+        self.port_num = port_num
+    
+    def run():
+
+        host_ip = thread_port.host_ip
+        timeout = thread_port.timeout
+
+        result , dt = try_connect( self.port_num , host_ip , timeout )
+        thread_port.portas[ self.port_num ] = ( result , dt ) 
+
+def sync():
+    
+    while True:
+        if thrd.active_count() == 1:
+            break
+
+def thread_scan(  host_name, start , end , timeout, must_serv = True ):
+    
+
+    s = scan_header( host_name, start , end , timeout)
+    yield s
+    
+    host_ip = sck.gethostbyname( host_name )
+    thread_port.host_ip = host_ip
+    thread_port.timeout = timeout
+
+    #--------------------------------------------------
+    # caso aluem troque os valores
+    if start > end: start , end = end , start
+    summary = {}
+
+    for port_num in range( start , end + 1 ):
+        if must_serv and not( check_service( port_num ) ): continue
+        thread_port( port_num ).start()
+    
+    sync()
+    portas = thread_port.portas
+    for port_num in range( start , end + 1 ):
+        if port_num not in portas: continue
+
+        result , dt = portas[ port_num ]
+        s = string_connect_result( port_num, result, dt )
+        yield s
+
+        #--------------------------------------------------
+        # salvando resultados na para summrizar
+        summary[ result ] = summary.get( result , 0 ) + 1
+    yield summary_str( summary )
 
 if __name__ == "__main__":
     
